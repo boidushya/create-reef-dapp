@@ -3,9 +3,21 @@
 import chalk from "chalk";
 import prompts from "prompts";
 import path from "path";
-import { existsSync } from "fs";
+import os from "os";
 import fse from "fs-extra";
 import _progress from "cli-progress";
+import { execSync } from "child_process";
+
+const cleanUpFiles = (folder) => {
+  console.log(chalk.yellow("Deleting template files...\n"));
+
+  fse.rmSync(path.join(folder), {
+    recursive: true,
+    force: true,
+  });
+
+  console.log("Project cleaned up ✅ ");
+};
 
 console.log(
   chalk.magenta(`
@@ -57,7 +69,7 @@ while (!projectPath) {
 //Reformat project's name
 projectPath = projectPath.trim().replace(/[\W_]+/g, "-");
 context.resolvedProjectPath = path.resolve(projectPath);
-let dirExists = existsSync(context.resolvedProjectPath);
+let dirExists = fse.existsSync(context.resolvedProjectPath);
 
 let i = 1;
 
@@ -73,7 +85,7 @@ while (dirExists) {
 
   context.resolvedProjectPath = path.resolve(projectPath);
 
-  dirExists = existsSync(context.resolvedProjectPath);
+  dirExists = fse.existsSync(context.resolvedProjectPath);
 
   i += 1;
 }
@@ -94,7 +106,16 @@ if (finalPrompt) {
   const b1 = new _progress.Bar({}, _progress.Presets.shades_classic);
   b1.start(40, 0);
   let value = 0;
-  fse.copySync(process.cwd() + "/core", context.resolvedProjectPath);
+
+  fse.mkdtemp(path.join(os.tmpdir(), "reef-"), (err, folder) => {
+    if (err) throw err;
+    execSync(
+      `git clone --depth 1 ${"https://github.com/boidushya/create-reef-dapp"} ${folder}`
+    );
+    fse.copySync(path.join(folder, "core"), context.resolvedProjectPath);
+    cleanUpFiles(folder);
+  });
+
   const timer = setInterval(function () {
     value++;
     b1.update(value);
