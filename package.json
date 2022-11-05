@@ -1,6 +1,6 @@
 {
   "name": "create-reef-dapp",
-  "version": "0.1.91",
+  "version": "0.2.0",
   "keywords": [
     "create-reef-dapp",
     "create reef dapp",
@@ -20,8 +20,7 @@
     "chalk": "^5.0.1",
     "cli-progress": "^3.11.2",
     "fs-extra": "^10.1.0",
-    "prompts": "^2.4.2",
-    "yargs": "^17.6.0"
+    "prompts": "^2.4.2"
   },
   "repository": {
     "type": "git",
