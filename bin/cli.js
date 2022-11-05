@@ -107,27 +107,27 @@ if (finalPrompt) {
   b1.start(40, 0);
   let value = 0;
 
-  fse.mkdtemp(path.join(os.tmpdir(), "reef-"), (err, folder) => {
-    if (err) throw err;
-    execSync(
-      `git clone --depth 1 ${"https://github.com/boidushya/create-reef-dapp"} ${folder}`
-    );
-    fse.copySync(path.join(folder, "core"), context.resolvedProjectPath);
-    cleanUpFiles(folder);
-  });
-
   const timer = setInterval(function () {
     value++;
     b1.update(value);
     if (value >= b1.getTotal()) {
       clearInterval(timer);
       b1.stop();
+      fse.mkdtemp(path.join(os.tmpdir(), "reef-"), (err, folder) => {
+        if (err) throw err;
+        execSync(
+          `git clone --depth 1 ${"https://github.com/boidushya/create-reef-dapp"} ${folder}`,
+          { stdio: "pipe" }
+        );
+        fse.copySync(path.join(folder, "core"), context.resolvedProjectPath);
+        cleanUpFiles(folder);
+      });
       console.log(
         chalk.bold(chalk.magenta("🎉 Your Reef Dapp is ready 🎉\n\n")),
         "To start your dapp, run the following commands:\n\n",
         chalk.bold("\tcd " + projectPath),
         chalk.bold("\n\tyarn install"),
-        chalk.bold("\n\tyarn start")
+        chalk.bold("\n\tyarn start\n\n")
       );
     }
   }, 20);
