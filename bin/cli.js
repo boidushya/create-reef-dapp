@@ -94,7 +94,7 @@ if (finalPrompt) {
   const b1 = new _progress.Bar({}, _progress.Presets.shades_classic);
   b1.start(40, 0);
   let value = 0;
-  fse.copySync("core", context.resolvedProjectPath);
+  fse.copySync(process.cwd() + "/core", context.resolvedProjectPath);
   const timer = setInterval(function () {
     value++;
     b1.update(value);
