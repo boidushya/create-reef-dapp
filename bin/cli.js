@@ -9,14 +9,12 @@ import _progress from "cli-progress";
 import { execSync } from "child_process";
 
 const cleanUpFiles = (folder) => {
-  console.log(chalk.yellow("Deleting template files...\n"));
-
   fse.rmSync(path.join(folder), {
     recursive: true,
     force: true,
   });
 
-  console.log("Project cleaned up ✅ ");
+  console.log(chalk.yellow("Project cleaned up ✅ "));
 };
 
 console.log(
@@ -43,7 +41,7 @@ console.log(
 );
 
 console.log("\n");
-console.log("🪸 Welcome to the create-reef-dapp wizard 🪸");
+console.log("🪸  Welcome to the create-reef-dapp wizard 🪸");
 console.log("\n");
 
 // if (process.argv[2]) {
@@ -62,7 +60,7 @@ while (!projectPath) {
   projectPath = await prompts({
     type: "text",
     name: "projectPath",
-    message: "Please, insert a project name \n",
+    message: "What is your project name? \n",
     initial: "my-reef-dapp",
   }).then((data) => data.projectPath);
 }
@@ -96,15 +94,15 @@ const finalPrompt = await prompts({
   name: "value",
   message: `Are you sure you want to create your reef dapp in ${chalk.magenta(
     projectPath
-  )} \n`,
+  )} folder? \n`,
   initial: true,
 }).then((data) => data.value);
 
 if (finalPrompt) {
   // copy template from core folder to project folder
-  console.log(chalk.bold(chalk.magenta("🚀 Creating your Reef Dapp 🚀")));
+  console.log(chalk.bold(chalk.magenta("\n🚀 Creating your Reef Dapp 🚀\n")));
   const b1 = new _progress.Bar({}, _progress.Presets.shades_classic);
-  b1.start(40, 0);
+  b1.start(100, 0);
   let value = 0;
 
   const timer = setInterval(function () {
@@ -123,14 +121,15 @@ if (finalPrompt) {
         cleanUpFiles(folder);
       });
       console.log(
-        chalk.bold(chalk.magenta("🎉 Your Reef Dapp is ready 🎉\n\n")),
+        chalk.bold(chalk.magenta("\n🎉 Your Reef Dapp is ready 🎉\n\n")),
         "To start your dapp, run the following commands:\n\n",
         chalk.bold("\tcd " + projectPath),
         chalk.bold("\n\tyarn install"),
-        chalk.bold("\n\tyarn start\n\n")
+        chalk.bold("\n\tyarn start\n")
       );
+      console.log(chalk.gray("Deleting temporary files..."));
     }
-  }, 20);
+  }, 10);
 } else {
   process.exit(0);
 }

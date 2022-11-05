@@ -1,5 +1,5 @@
 {
-  "name": "create-reef-dapp",
+  "name": "create-reef-dapp-client",
   "version": "0.1.0",
   "dependencies": {
     "@craco/craco": "^6.4.0",
