@@ -12,19 +12,18 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
-const createDapp = resolvedProjectPath => {
+const createDapp = (resolvedProjectPath, projectPath) => {
 	// Create the project folder and copy the template files
 	console.log(chalk.bold(chalk.magenta("\n🚀 Creating your Reef Dapp 🚀\n")));
-	const b1 = new _progress.Bar({}, _progress.Presets.shades_classic);
-	b1.start(100, 0);
+	const progressBar = new _progress.Bar({}, _progress.Presets.shades_classic);
+	progressBar.start(100, 0);
 	let value = 0;
 
 	const timer = setInterval(function () {
 		value++;
-		b1.update(value);
-		if (value >= b1.getTotal()) {
+		progressBar.update(value);
+		if (value >= progressBar.getTotal()) {
 			clearInterval(timer);
-			b1.stop();
 			fse.mkdtemp(path.join(os.tmpdir(), "reef-"), (err, folder) => {
 				if (err) throw err;
 				execSync(
@@ -32,18 +31,19 @@ const createDapp = resolvedProjectPath => {
 					{ stdio: "pipe" }
 				);
 				fse.copySync(path.join(folder, "core"), resolvedProjectPath);
+				progressBar.stop();
+				console.log(
+					chalk.bold(
+						chalk.magenta("\n🎉 Your Reef Dapp is ready 🎉\n\n")
+					),
+					"To start your dapp, run the following commands:\n\n",
+					chalk.bold("\tcd " + projectPath),
+					chalk.bold("\n\tyarn install"),
+					chalk.bold("\n\tyarn start\n")
+				);
+				console.log(chalk.gray("Deleting temporary files..."));
 				cleanUpFiles(folder);
 			});
-			console.log(
-				chalk.bold(
-					chalk.magenta("\n🎉 Your Reef Dapp is ready 🎉\n\n")
-				),
-				"To start your dapp, run the following commands:\n\n",
-				chalk.bold("\tcd " + projectPath),
-				chalk.bold("\n\tyarn install"),
-				chalk.bold("\n\tyarn start\n")
-			);
-			console.log(chalk.gray("Deleting temporary files..."));
 		}
 	}, 10);
 };
@@ -97,7 +97,7 @@ try {
 	);
 
 	console.log("\n");
-	console.log("🪸  Welcome to the create-reef-dapp wizard 🪸");
+	console.log("🪸 Welcome to the create-reef-dapp wizard 🪸");
 
 	// If the project path is not provided, ask the user for it
 	let projectPath = "";
@@ -148,7 +148,7 @@ try {
 	context.projectName = path.basename(context.resolvedProjectPath);
 
 	if (cmdLineRes.folderName) {
-		createDapp(context.resolvedProjectPath);
+		createDapp(context.resolvedProjectPath, context.projectName);
 	} else {
 		const finalPrompt = await prompts({
 			type: "confirm",
@@ -160,7 +160,7 @@ try {
 		}).then(data => data.value);
 
 		if (finalPrompt) {
-			createDapp(context.projectName);
+			createDapp(context.projectName, context.projectName);
 		} else {
 			process.exit(0);
 		}
