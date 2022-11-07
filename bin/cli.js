@@ -8,6 +8,9 @@ import fse from "fs-extra";
 import _progress from "cli-progress";
 import { execSync } from "child_process";
 import yargs from "yargs/yargs";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 const createDapp = resolvedProjectPath => {
 	// Create the project folder and copy the template files
@@ -68,9 +71,10 @@ const cmdLineRes = yargs(process.argv.slice(2)).command(
 	}
 ).argv;
 
-// Print the Reef logo and welcome message
-console.log(
-	chalk.magenta(`
+try {
+	// Print the Reef logo and welcome message
+	console.log(
+		chalk.magenta(`
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @@@@@@@@@@@@                   %@@@@@@@@
 @@@@@@@                            @@@@@
@@ -90,74 +94,77 @@ console.log(
 @@          @@@@@@@                  @@@
 @@        @@@@@@@@@@@            %@@@@@@
 `)
-);
+	);
 
-console.log("\n");
-console.log("🪸  Welcome to the create-reef-dapp wizard 🪸");
-
-// If the project path is not provided, ask the user for it
-let projectPath = "";
-let context = {};
-
-projectPath = cmdLineRes.folderName || "";
-
-// Checks if project name is provided
-if (typeof projectPath === "string") {
-	projectPath = projectPath.trim();
-}
-
-while (!projectPath) {
 	console.log("\n");
-	projectPath = await prompts({
-		type: "text",
-		name: "projectPath",
-		message: "What is your project name? \n",
-		initial: "my-reef-dapp",
-	}).then(data => data.projectPath);
-}
+	console.log("🪸  Welcome to the create-reef-dapp wizard 🪸");
 
-//Reformat project's name
-projectPath = projectPath.trim().replace(/[\W_]+/g, "-");
-context.resolvedProjectPath = path.resolve(projectPath);
-let dirExists = fse.existsSync(context.resolvedProjectPath);
+	// If the project path is not provided, ask the user for it
+	let projectPath = "";
+	let context = {};
 
-let i = 1;
+	projectPath = cmdLineRes.folderName || "";
 
-// Check if project exists
-while (dirExists) {
-	projectPath = await prompts({
-		type: "text",
-		name: "projectPath",
-		message:
-			"A directory with this name already exists, please use a different name \n",
-		initial: cmdLineRes.folderName
-			? `${cmdLineRes.folderName}-${i}`
-			: `my-reef-dapp-${i}`,
-	}).then(data => data.projectPath.trim().replace(/[\W_]+/g, "-"));
+	// Checks if project name is provided
+	if (typeof projectPath === "string") {
+		projectPath = projectPath.trim();
+	}
 
+	while (!projectPath) {
+		console.log("\n");
+		projectPath = await prompts({
+			type: "text",
+			name: "projectPath",
+			message: "What is your project name? \n",
+			initial: "my-reef-dapp",
+		}).then(data => data.projectPath);
+	}
+
+	//Reformat project's name
+	projectPath = projectPath.trim().replace(/[\W_]+/g, "-");
 	context.resolvedProjectPath = path.resolve(projectPath);
+	let dirExists = fse.existsSync(context.resolvedProjectPath);
 
-	dirExists = fse.existsSync(context.resolvedProjectPath);
+	let i = 1;
 
-	i += 1;
-}
-context.projectName = path.basename(context.resolvedProjectPath);
+	// Check if project exists
+	while (dirExists) {
+		projectPath = await prompts({
+			type: "text",
+			name: "projectPath",
+			message:
+				"A directory with this name already exists, please use a different name \n",
+			initial: cmdLineRes.folderName
+				? `${cmdLineRes.folderName}-${i}`
+				: `${projectPath}-${i}`,
+		}).then(data => data.projectPath.trim().replace(/[\W_]+/g, "-"));
 
-if (cmdLineRes.folderName) {
-	createDapp(context.resolvedProjectPath);
-} else {
-	const finalPrompt = await prompts({
-		type: "confirm",
-		name: "value",
-		message: `Are you sure you want to create your reef dapp in ${chalk.magenta(
-			projectPath
-		)} folder? \n`,
-		initial: true,
-	}).then(data => data.value);
+		context.resolvedProjectPath = path.resolve(projectPath);
 
-	if (finalPrompt) {
+		dirExists = fse.existsSync(context.resolvedProjectPath);
+
+		i += 1;
+	}
+	context.projectName = path.basename(context.resolvedProjectPath);
+
+	if (cmdLineRes.folderName) {
 		createDapp(context.resolvedProjectPath);
 	} else {
-		process.exit(0);
+		const finalPrompt = await prompts({
+			type: "confirm",
+			name: "value",
+			message: `Are you sure you want to create your reef dapp in ${chalk.magenta(
+				projectPath
+			)} folder? \n`,
+			initial: true,
+		}).then(data => data.value);
+
+		if (finalPrompt) {
+			createDapp(context.projectName);
+		} else {
+			process.exit(0);
+		}
 	}
+} catch (err) {
+	process.env.ENVIRONMENT === "development" && console.error(err);
 }

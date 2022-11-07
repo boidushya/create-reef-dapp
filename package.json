@@ -1,6 +1,6 @@
 {
 	"name": "create-reef-dapp",
-	"version": "0.3.1",
+	"version": "0.3.2",
 	"keywords": [
 		"create-reef-dapp",
 		"create reef dapp",
@@ -8,9 +8,9 @@
 		"reef"
 	],
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
+		"dev": "nodemon bin/cli.js",
 		"lint": "eslint . --ext .ts && yarn prettier --write .",
-		"start": "npx tsc && npm link && npx create-reef-dapp"
+		"start": "node bin/cli.js"
 	},
 	"bin": {
 		"create-reef-dapp": "./bin/cli.js"
@@ -19,6 +19,7 @@
 	"dependencies": {
 		"chalk": "^5.0.1",
 		"cli-progress": "^3.11.2",
+		"dotenv": "^16.0.3",
 		"fs-extra": "^10.1.0",
 		"prompts": "^2.4.2",
 		"yargs": "^17.6.2"
