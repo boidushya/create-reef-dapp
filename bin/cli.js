@@ -7,18 +7,70 @@ import os from "os";
 import fse from "fs-extra";
 import _progress from "cli-progress";
 import { execSync } from "child_process";
+import yargs from "yargs/yargs";
 
-const cleanUpFiles = (folder) => {
-  fse.rmSync(path.join(folder), {
-    recursive: true,
-    force: true,
-  });
+const createDapp = resolvedProjectPath => {
+	// Create the project folder and copy the template files
+	console.log(chalk.bold(chalk.magenta("\n🚀 Creating your Reef Dapp 🚀\n")));
+	const b1 = new _progress.Bar({}, _progress.Presets.shades_classic);
+	b1.start(100, 0);
+	let value = 0;
 
-  console.log(chalk.yellow("Project cleaned up ✅ "));
+	const timer = setInterval(function () {
+		value++;
+		b1.update(value);
+		if (value >= b1.getTotal()) {
+			clearInterval(timer);
+			b1.stop();
+			fse.mkdtemp(path.join(os.tmpdir(), "reef-"), (err, folder) => {
+				if (err) throw err;
+				execSync(
+					`git clone --depth 1 ${"https://github.com/boidushya/create-reef-dapp"} ${folder}`,
+					{ stdio: "pipe" }
+				);
+				fse.copySync(path.join(folder, "core"), resolvedProjectPath);
+				cleanUpFiles(folder);
+			});
+			console.log(
+				chalk.bold(
+					chalk.magenta("\n🎉 Your Reef Dapp is ready 🎉\n\n")
+				),
+				"To start your dapp, run the following commands:\n\n",
+				chalk.bold("\tcd " + projectPath),
+				chalk.bold("\n\tyarn install"),
+				chalk.bold("\n\tyarn start\n")
+			);
+			console.log(chalk.gray("Deleting temporary files..."));
+		}
+	}, 10);
 };
 
+const cleanUpFiles = folder => {
+	// Delete the temporary folder
+	fse.rmSync(path.join(folder), {
+		recursive: true,
+		force: true,
+	});
+
+	console.log(chalk.yellow("Project cleaned up ✅ "));
+};
+
+// Get the project path from the command line if provided, else default to null
+const cmdLineRes = yargs(process.argv.slice(2)).command(
+	"$0 [folder-name]",
+	"create a new Reef Dapp project",
+	yargs => {
+		yargs.positional("folder-name", {
+			describe: "Folder to create your Reef dapp in",
+			type: "string",
+			default: null,
+		});
+	}
+).argv;
+
+// Print the Reef logo and welcome message
 console.log(
-  chalk.magenta(`
+	chalk.magenta(`
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @@@@@@@@@@@@                   %@@@@@@@@
 @@@@@@@                            @@@@@
@@ -42,28 +94,28 @@ console.log(
 
 console.log("\n");
 console.log("🪸  Welcome to the create-reef-dapp wizard 🪸");
-console.log("\n");
 
-// if (process.argv[2]) {
-//   // TODO directly create the dapp
-// }
-
+// If the project path is not provided, ask the user for it
 let projectPath = "";
 let context = {};
 
-projectPath = "";
+projectPath = cmdLineRes.folderName || "";
+
 // Checks if project name is provided
 if (typeof projectPath === "string") {
-  projectPath = projectPath.trim();
+	projectPath = projectPath.trim();
 }
+
 while (!projectPath) {
-  projectPath = await prompts({
-    type: "text",
-    name: "projectPath",
-    message: "What is your project name? \n",
-    initial: "my-reef-dapp",
-  }).then((data) => data.projectPath);
+	console.log("\n");
+	projectPath = await prompts({
+		type: "text",
+		name: "projectPath",
+		message: "What is your project name? \n",
+		initial: "my-reef-dapp",
+	}).then(data => data.projectPath);
 }
+
 //Reformat project's name
 projectPath = projectPath.trim().replace(/[\W_]+/g, "-");
 context.resolvedProjectPath = path.resolve(projectPath);
@@ -73,63 +125,39 @@ let i = 1;
 
 // Check if project exists
 while (dirExists) {
-  projectPath = await prompts({
-    type: "text",
-    name: "projectPath",
-    message:
-      "A directory with this name already exists, please use a different name \n",
-    initial: `my-reef-dapp-${i}`,
-  }).then((data) => data.projectPath.trim().replace(/[\W_]+/g, "-"));
+	projectPath = await prompts({
+		type: "text",
+		name: "projectPath",
+		message:
+			"A directory with this name already exists, please use a different name \n",
+		initial: cmdLineRes.folderName
+			? `${cmdLineRes.folderName}-${i}`
+			: `my-reef-dapp-${i}`,
+	}).then(data => data.projectPath.trim().replace(/[\W_]+/g, "-"));
 
-  context.resolvedProjectPath = path.resolve(projectPath);
+	context.resolvedProjectPath = path.resolve(projectPath);
 
-  dirExists = fse.existsSync(context.resolvedProjectPath);
+	dirExists = fse.existsSync(context.resolvedProjectPath);
 
-  i += 1;
+	i += 1;
 }
 context.projectName = path.basename(context.resolvedProjectPath);
 
-const finalPrompt = await prompts({
-  type: "confirm",
-  name: "value",
-  message: `Are you sure you want to create your reef dapp in ${chalk.magenta(
-    projectPath
-  )} folder? \n`,
-  initial: true,
-}).then((data) => data.value);
-
-if (finalPrompt) {
-  // copy template from core folder to project folder
-  console.log(chalk.bold(chalk.magenta("\n🚀 Creating your Reef Dapp 🚀\n")));
-  const b1 = new _progress.Bar({}, _progress.Presets.shades_classic);
-  b1.start(100, 0);
-  let value = 0;
-
-  const timer = setInterval(function () {
-    value++;
-    b1.update(value);
-    if (value >= b1.getTotal()) {
-      clearInterval(timer);
-      b1.stop();
-      fse.mkdtemp(path.join(os.tmpdir(), "reef-"), (err, folder) => {
-        if (err) throw err;
-        execSync(
-          `git clone --depth 1 ${"https://github.com/boidushya/create-reef-dapp"} ${folder}`,
-          { stdio: "pipe" }
-        );
-        fse.copySync(path.join(folder, "core"), context.resolvedProjectPath);
-        cleanUpFiles(folder);
-      });
-      console.log(
-        chalk.bold(chalk.magenta("\n🎉 Your Reef Dapp is ready 🎉\n\n")),
-        "To start your dapp, run the following commands:\n\n",
-        chalk.bold("\tcd " + projectPath),
-        chalk.bold("\n\tyarn install"),
-        chalk.bold("\n\tyarn start\n")
-      );
-      console.log(chalk.gray("Deleting temporary files..."));
-    }
-  }, 10);
+if (cmdLineRes.folderName) {
+	createDapp(context.resolvedProjectPath);
 } else {
-  process.exit(0);
+	const finalPrompt = await prompts({
+		type: "confirm",
+		name: "value",
+		message: `Are you sure you want to create your reef dapp in ${chalk.magenta(
+			projectPath
+		)} folder? \n`,
+		initial: true,
+	}).then(data => data.value);
+
+	if (finalPrompt) {
+		createDapp(context.resolvedProjectPath);
+	} else {
+		process.exit(0);
+	}
 }

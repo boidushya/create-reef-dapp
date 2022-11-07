@@ -1,30 +1,31 @@
 {
-  "name": "create-reef-dapp",
-  "version": "0.2.4",
-  "keywords": [
-    "create-reef-dapp",
-    "create reef dapp",
-    "boilerplate",
-    "reef"
-  ],
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint . --ext .ts && yarn prettier --write .",
-    "start": "npx tsc && npm link && npx create-reef-dapp"
-  },
-  "bin": {
-    "create-reef-dapp": "./bin/cli.js"
-  },
-  "type": "module",
-  "dependencies": {
-    "chalk": "^5.0.1",
-    "cli-progress": "^3.11.2",
-    "fs-extra": "^10.1.0",
-    "prompts": "^2.4.2"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/boidushya/create-reef-dapp.git"
-  },
-  "homepage": "https://github.com/boidushya/create-reef-dapp/blob/main/README.md"
+	"name": "create-reef-dapp",
+	"version": "0.3.0",
+	"keywords": [
+		"create-reef-dapp",
+		"create reef dapp",
+		"boilerplate",
+		"reef"
+	],
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"lint": "eslint . --ext .ts && yarn prettier --write .",
+		"start": "npx tsc && npm link && npx create-reef-dapp"
+	},
+	"bin": {
+		"create-reef-dapp": "./bin/cli.js"
+	},
+	"type": "module",
+	"dependencies": {
+		"chalk": "^5.0.1",
+		"cli-progress": "^3.11.2",
+		"fs-extra": "^10.1.0",
+		"prompts": "^2.4.2",
+		"yargs": "^17.6.2"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/boidushya/create-reef-dapp.git"
+	},
+	"homepage": "https://github.com/boidushya/create-reef-dapp/blob/main/README.md"
 }
