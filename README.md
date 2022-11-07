@@ -15,7 +15,7 @@ with npx:
 
 ```bash
 npx create-reef-dapp [project-name]
-cd [name of directory]
+cd <project-name>
 yarn
 yarn start
 ```
@@ -24,7 +24,7 @@ with yarn create:
 
 ```bash
 yarn create reef-dapp [project-name]
-cd [name of directory]
+cd <project-name>
 yarn
 yarn start
 ```
