@@ -6,15 +6,30 @@ This is a template for creating a Reef Dapp.
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/en/) (v12.0.0 or later)
-- [Yarn](https://yarnpkg.com/) (v1.22.0 or later)
+-   [Node.js](https://nodejs.org/en/) (v12.0.0 or later)
+-   [Yarn](https://yarnpkg.com/) (v1.22.0 or later)
 
 ### Installation
 
-1. npx create-reef-dapp
-2. cd [name of directory]
-3. yarn
-4. yarn start
+with npx:
+
+```bash
+npx create-reef-dapp [project-name]
+cd [name of directory]
+yarn
+yarn start
+```
+
+with yarn create:
+
+```bash
+yarn create reef-dapp [project-name]
+cd [name of directory]
+yarn
+yarn start
+```
+
+**NOTE:** _The Reef React dapp currently only supports yarn._
 
 ## Usage
 
