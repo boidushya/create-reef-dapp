@@ -38,7 +38,7 @@ const createDapp = (resolvedProjectPath, projectPath) => {
 					),
 					"To start your dapp, run the following commands:\n\n",
 					chalk.bold("\tcd " + projectPath),
-					chalk.bold("\n\tyarn install"),
+					chalk.bold("\n\tyarn"),
 					chalk.bold("\n\tyarn start\n")
 				);
 				console.log(chalk.gray("Deleting temporary files..."));
