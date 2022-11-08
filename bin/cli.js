@@ -31,6 +31,10 @@ const createDapp = (resolvedProjectPath, projectPath) => {
 					{ stdio: "pipe" }
 				);
 				fse.copySync(path.join(folder, "core"), resolvedProjectPath);
+				fse.writeFileSync(
+					path.join(resolvedProjectPath, ".env"),
+					"SKIP_PREFLIGHT_CHECK=true"
+				);
 				progressBar.stop();
 				console.log(
 					chalk.bold(
