@@ -28,5 +28,8 @@
 		"type": "git",
 		"url": "https://github.com/boidushya/create-reef-dapp.git"
 	},
-	"homepage": "https://github.com/boidushya/create-reef-dapp/blob/main/README.md"
+	"homepage": "https://github.com/boidushya/create-reef-dapp/blob/main/README.md",
+	"devDependencies": {
+		"nodemon": "^2.0.20"
+	}
 }
